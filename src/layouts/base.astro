@@ -15,7 +15,7 @@ const seo = channel?.seo
 const reqPathname = Astro.url.pathname.replace(/\/$/, '')
 const canonical = SITE_URL.startsWith('http') ? new URL(SITE_URL).origin + reqPathname : Astro.url.origin + reqPathname
 
-const { origin, pathname } = new URL(canonical)
+const { origin } = new URL(canonical)
 const twitter = getEnv(import.meta.env, Astro, 'TWITTER')
 
 const seoParams = {
@@ -53,18 +53,12 @@ const searchAction = GOOGLE_SEARCH_SITE ? 'https://www.google.com/search' : '/se
 
 const HEADER_INJECT = getEnv(import.meta.env, Astro, 'HEADER_INJECT')
 const FOOTER_INJECT = getEnv(import.meta.env, Astro, 'FOOTER_INJECT')
-const TAGS = getEnv(import.meta.env, Astro, 'TAGS')
-const LINKS = getEnv(import.meta.env, Astro, 'LINKS')
-const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
-  .split(';')
-  .filter(Boolean)
-  .map((link) => {
-    link = link.split(',')
-    return {
-      title: link[0],
-      href: link[1],
-    }
-  })
+const navs = [
+  { title: 'Home', href: 'https://wilsonchao.com' },
+  { title: 'Daily', href: 'https://wilsonchao.com/daily' },
+  { title: 'Blog', href: 'https://wilsonchao.com/blog' },
+  { title: 'About', href: 'https://wilsonchao.com/about' },
+]
 ---
 
 <!doctype html>
@@ -100,41 +94,10 @@ const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
         <div id="aside-container">
           <slot name="aside">
             <div class="nav">
-              <div class="nav-item">
-                <a href={SITE_URL} title={channel?.title} class={`nav-link ${pathname === '/' ? 'current' : ''}`}>
-                  Home
-                </a>
-              </div>
-              {
-                TAGS ? (
-                  <div class="nav-item">
-                    <a
-                      href={`${SITE_URL}tags`}
-                      title="Tags"
-                      class={`nav-link ${pathname === '/tags' ? 'current' : ''}`}
-                    >
-                      Tags
-                    </a>
-                  </div>
-                ) : null
-              }
-              {
-                LINKS ? (
-                  <div class="nav-item">
-                    <a
-                      href={`${SITE_URL}links`}
-                      title="Links"
-                      class={`nav-link ${pathname === '/links' ? 'current' : ''}`}
-                    >
-                      Links
-                    </a>
-                  </div>
-                ) : null
-              }
               {
                 navs.map((nav) => (
                   <div class="nav-item">
-                    <a href={nav.href} title={nav.title} target="_blank" rel="noopener" class="nav-link">
+                    <a href={nav.href} title={nav.title} class="nav-link">
                       {nav.title}
                     </a>
                   </div>
