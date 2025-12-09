@@ -20,11 +20,6 @@ html {
   top: 0;
 }
 
-#aside-container .nav {
-  position: static;
-  top: unset;
-}
-
 .search-icon {
   position: absolute;
   top: 20px;

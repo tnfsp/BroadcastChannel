@@ -53,11 +53,15 @@ const searchAction = GOOGLE_SEARCH_SITE ? 'https://www.google.com/search' : '/se
 
 const HEADER_INJECT = getEnv(import.meta.env, Astro, 'HEADER_INJECT')
 const FOOTER_INJECT = getEnv(import.meta.env, Astro, 'FOOTER_INJECT')
+const staticProxy = getEnv(import.meta.env, Astro, 'STATIC_PROXY') ?? '/static/'
+const navAvatar = channel?.avatar?.startsWith('http') ? staticProxy + channel.avatar : '/favicon.svg'
 const navs = [
   { title: 'Home', href: 'https://wilsonchao.com' },
-  { title: 'Daily', href: 'https://wilsonchao.com/daily' },
   { title: 'Blog', href: 'https://wilsonchao.com/blog' },
+  { title: 'Murmur', href: 'https://murmur.wilsonchao.com' },
+  { title: 'Daily', href: 'https://wilsonchao.com/daily' },
   { title: 'About', href: 'https://wilsonchao.com/about' },
+  { title: 'Links', href: 'https://wilsonchao.com/links' },
 ]
 ---
 
@@ -86,6 +90,43 @@ const navs = [
   </head>
 
   <body>
+    <header class="site-nav-bar">
+      <div class="site-nav-inner">
+        <a href={SITE_URL} aria-label="Go to homepage" class="site-nav-brand">
+          <img src={navAvatar} alt={channel?.title} loading="eager" />
+        </a>
+        <nav class="site-nav" aria-label="Primary navigation">
+          {
+            navs.map((nav) => (
+              <a href={nav.href} title={nav.title} class="site-nav-link">
+                {nav.title}
+              </a>
+            ))
+          }
+        </nav>
+        <button
+          type="button"
+          class="nav-toggle"
+          aria-expanded="false"
+          aria-controls="mobile-nav"
+          data-nav-toggle
+        >
+          Menu
+          <span class="nav-toggle-icon" aria-hidden="true">></span>
+        </button>
+      </div>
+      <div class="mobile-nav" id="mobile-nav" data-mobile-nav hidden>
+        <div class="mobile-nav-panel">
+          {
+            navs.map((nav) => (
+              <a href={nav.href} title={nav.title} class="mobile-nav-link">
+                {nav.title}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </header>
     <div id="wrapper">
       <div id="container">
         <div id="main-container">
@@ -93,17 +134,6 @@ const navs = [
         </div>
         <div id="aside-container">
           <slot name="aside">
-            <div class="nav">
-              {
-                navs.map((nav) => (
-                  <div class="nav-item">
-                    <a href={nav.href} title={nav.title} class="nav-link">
-                      {nav.title}
-                    </a>
-                  </div>
-                ))
-              }
-            </div>
             <input class="search-icon" name="icon" type="checkbox" placeholder="Search" />
             <form class="search-form" action={searchAction} method="get">
               {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
@@ -131,5 +161,31 @@ const navs = [
       <img {...backToTopIcon} alt="Back to Top" />
     </a>
     <Fragment set:html={FOOTER_INJECT} />
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const toggle = document.querySelector('[data-nav-toggle]')
+        const panel = document.querySelector('[data-mobile-nav]')
+        const icon = toggle?.querySelector('.nav-toggle-icon')
+
+        const setNavState = (nextState) => {
+          toggle?.setAttribute('aria-expanded', String(nextState))
+          if (panel) {
+            panel.hidden = !nextState
+          }
+          if (icon) {
+            icon.classList.toggle('open', nextState)
+          }
+        }
+
+        toggle?.addEventListener('click', () => {
+          const isOpen = toggle.getAttribute('aria-expanded') === 'true'
+          setNavState(!isOpen)
+        })
+
+        panel?.querySelectorAll('a')?.forEach((link) => {
+          link.addEventListener('click', () => setNavState(false))
+        })
+      })
+    </script>
   </body>
 </html>

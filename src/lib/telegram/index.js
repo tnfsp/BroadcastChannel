@@ -101,8 +101,50 @@ function getReply($, item, { channel }) {
   return $.html(reply)
 }
 
+function decodeEmojiText(text = '') {
+  const match = text.trim().match(/^U\+?0*([0-9A-F]{4,6})$/i)
+  if (match?.[1]) {
+    const codePoint = Number.parseInt(match[1], 16)
+    if (!Number.isNaN(codePoint)) {
+      return String.fromCodePoint(codePoint)
+    }
+  }
+  return text.trim()
+}
+
+function decodeEmojiFromStyle(style = '') {
+  const match = style.match(/emoji\/\d+\/([A-F0-9]+)\.png/i)
+  if (match?.[1]) {
+    try {
+      const bytes = match[1].match(/.{1,2}/g)?.map(byte => Number.parseInt(byte, 16))
+      if (bytes?.length && typeof TextDecoder !== 'undefined') {
+        return new TextDecoder().decode(new Uint8Array(bytes))
+      }
+    }
+    catch (error) {
+      console.error(error)
+    }
+  }
+}
+
 function modifyHTMLContent($, content, { index } = {}) {
-  $(content).find('.emoji')?.removeAttr('style')
+  $(content).find('.emoji')?.each((_idx, emoji) => {
+    const current = $(emoji)?.text()?.trim()
+    if (!current) {
+      const parent = $(emoji)?.parent('tg-emoji')
+      const sourceText = decodeEmojiText(
+        $(emoji)?.attr('aria-label')
+        || $(emoji)?.attr('emoji-text')
+        || $(emoji)?.attr('data-emoji-text')
+        || parent?.attr('emoji-text')
+        || parent?.attr('aria-label'),
+      ) || decodeEmojiFromStyle($(emoji)?.attr('style'))
+      if (sourceText) {
+        $(emoji).text(sourceText)
+      }
+    }
+    $(emoji)?.removeAttr('style')
+  })
   $(content).find('a')?.each((_index, a) => {
     $(a)?.attr('title', $(a)?.text())?.removeAttr('onclick')
   })
