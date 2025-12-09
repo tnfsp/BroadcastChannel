@@ -184,12 +184,10 @@ export async function getChannelInfo(Astro, { before = '', after = '', q = '', t
   }
 
   // Where t.me can also be telegram.me, telegram.dog
-  const host = getEnv(import.meta.env, Astro, 'TELEGRAM_HOST') ?? 't.me'
+  let host = getEnv(import.meta.env, Astro, 'TELEGRAM_HOST') ?? 't.me'
   const channel = getEnv(import.meta.env, Astro, 'CHANNEL')
   const staticProxy = getEnv(import.meta.env, Astro, 'STATIC_PROXY') ?? '/static/'
 
-  const search = qDecoded ? `?q=${encodeURIComponent(qDecoded)}` : ''
-  const url = id ? `https://${host}/${channel}/${id}?embed=1&mode=tme` : `https://${host}/s/${channel}${search}`
   const headers = Object.fromEntries(Astro.request.headers)
 
   Object.keys(headers).forEach((key) => {
@@ -198,17 +196,38 @@ export async function getChannelInfo(Astro, { before = '', after = '', q = '', t
     }
   })
 
-  console.info('Fetching', url, { before, after, q, type, id })
-  const html = await $fetch(url, {
-    headers,
-    query: {
-      before: before || undefined,
-      after: after || undefined,
-      q: q || undefined,
-    },
-    retry: 3,
-    retryDelay: 100,
-  })
+  const hostCandidates = [host, 'telegram.dog'].filter((item, index, array) => item && array.indexOf(item) === index)
+  let html
+  let lastError
+
+  for (const currentHost of hostCandidates) {
+    const search = qDecoded ? `?q=${encodeURIComponent(qDecoded)}` : ''
+    const url = id ? `https://${currentHost}/${channel}/${id}?embed=1&mode=tme` : `https://${currentHost}/s/${channel}${search}`
+
+    console.info('Fetching', url, { before, after, q: qDecoded, type, id })
+    try {
+      html = await $fetch(url, {
+        headers,
+        query: {
+          before: before || undefined,
+          after: after || undefined,
+          q: qDecoded || undefined,
+        },
+        retry: 3,
+        retryDelay: 100,
+      })
+      host = currentHost
+      break
+    }
+    catch (error) {
+      lastError = error
+      console.error('Fetch failed', url, error)
+    }
+  }
+
+  if (!html) {
+    throw lastError || new Error('Fetch failed')
+  }
 
   const $ = cheerio.load(html, {}, false)
   if (id) {
