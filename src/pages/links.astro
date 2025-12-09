@@ -1,6 +1,5 @@
 ---
 import Layout from '../layouts/base.astro'
-import Header from '../components/header.astro'
 import { getChannelInfo } from '../lib/telegram'
 import { getEnv } from '../lib/env'
 
@@ -27,10 +26,6 @@ if (!links.length) {
 ---
 
 <Layout channel={channel} id="main-container">
-  <slot name="header">
-    <Header channel={channel} />
-  </slot>
-
   <div class="section-title">Links</div>
 
   <div class="tag-cloud">
