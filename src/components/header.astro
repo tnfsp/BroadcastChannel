@@ -22,6 +22,7 @@ const MASTODON = getEnv(import.meta.env, Astro, 'MASTODON')
 const BLUESKY = getEnv(import.meta.env, Astro, 'BLUESKY')
 
 const staticProxy = getEnv(import.meta.env, Astro, 'STATIC_PROXY') ?? '/static/'
+const tags = (getEnv(import.meta.env, Astro, 'TAGS') || '').split(',').map(tag => tag.trim()).filter(Boolean).slice(0, 10)
 ---
 
 <div id="header">
@@ -107,6 +108,21 @@ const staticProxy = getEnv(import.meta.env, Astro, 'STATIC_PROXY') ?? '/static/'
   )
 }
 
+{
+  tags.length > 0 && (
+    <div class="tag-quick-nav" aria-label="Quick tags">
+      <div class="tag-quick-nav-title">Tags</div>
+      <div class="tag-quick-nav-list">
+        {tags.map((tag) => (
+          <a class="tag-chip" href={`/search/%23${tag}`} title={`#${tag}`}>
+            #{tag}
+          </a>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 <style>
   #site-intro {
     color: var(--secondary-color);
@@ -125,5 +141,57 @@ const staticProxy = getEnv(import.meta.env, Astro, 'STATIC_PROXY') ?? '/static/'
 
   .header-icons {
     gap: 2px;
+  }
+
+  .tag-quick-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 0 16px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--code-background-color);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  }
+
+  .tag-quick-nav-title {
+    font-weight: 600;
+    color: var(--text-color);
+    letter-spacing: 0.2px;
+  }
+
+  .tag-quick-nav-list {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: thin;
+  }
+
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--background-color);
+    border: 1px solid var(--light-border-color);
+    color: var(--text-color);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+  }
+
+  .tag-chip:hover,
+  .tag-chip:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  @media (max-width: 720px) {
+    .tag-quick-nav {
+      margin: 10px 0 12px;
+      padding: 10px;
+    }
   }
 </style>
