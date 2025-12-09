@@ -149,15 +149,16 @@ const tags = (getEnv(import.meta.env, Astro, 'TAGS') || '').split(',').map(tag =
     gap: 8px;
     margin: 12px 0 16px;
     padding: 10px 12px;
-    border-radius: 12px;
-    background: var(--code-background-color);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
   }
 
   .tag-quick-nav-title {
-    font-weight: 600;
-    color: var(--text-color);
-    letter-spacing: 0.2px;
+    font-weight: 500;
+    color: var(--foreground-secondary-color);
+    font-size: 0.95em;
+    letter-spacing: 0.1px;
   }
 
   .tag-quick-nav-list {
@@ -172,20 +173,23 @@ const tags = (getEnv(import.meta.env, Astro, 'TAGS') || '').split(',').map(tag =
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 6px 12px;
+    padding: 6px 10px;
     border-radius: 999px;
-    background: var(--background-color);
-    border: 1px solid var(--light-border-color);
-    color: var(--text-color);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--secondary-color);
     text-decoration: none;
     white-space: nowrap;
-    transition: transform 120ms ease, box-shadow 120ms ease;
+    font-weight: 500;
+    font-size: 0.95em;
+    transition: color 120ms ease, border-color 120ms ease, transform 120ms ease;
   }
 
   .tag-chip:hover,
   .tag-chip:focus-visible {
+    color: var(--link-color);
+    border-color: var(--link-color);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 
   @media (max-width: 720px) {
