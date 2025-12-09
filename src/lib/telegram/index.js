@@ -187,7 +187,8 @@ export async function getChannelInfo(Astro, { before = '', after = '', q = '', t
   const channel = getEnv(import.meta.env, Astro, 'CHANNEL')
   const staticProxy = getEnv(import.meta.env, Astro, 'STATIC_PROXY') ?? '/static/'
 
-  const url = id ? `https://${host}/${channel}/${id}?embed=1&mode=tme` : `https://${host}/s/${channel}`
+  const search = q ? `?q=${encodeURIComponent(q)}` : ''
+  const url = id ? `https://${host}/${channel}/${id}?embed=1&mode=tme` : `https://${host}/s/${channel}${search}`
   const headers = Object.fromEntries(Astro.request.headers)
 
   Object.keys(headers).forEach((key) => {
