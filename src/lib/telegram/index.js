@@ -174,7 +174,8 @@ function getPost($, item, { channel, staticProxy, index = 0 }) {
 const unnessaryHeaders = ['host', 'cookie', 'origin', 'referer']
 
 export async function getChannelInfo(Astro, { before = '', after = '', q = '', type = 'list', id = '' } = {}) {
-  const cacheKey = JSON.stringify({ before, after, q, type, id })
+  const qDecoded = typeof q === 'string' ? decodeURIComponent(q) : ''
+  const cacheKey = JSON.stringify({ before, after, q: qDecoded, type, id })
   const cachedResult = cache.get(cacheKey)
 
   if (cachedResult) {
@@ -187,7 +188,7 @@ export async function getChannelInfo(Astro, { before = '', after = '', q = '', t
   const channel = getEnv(import.meta.env, Astro, 'CHANNEL')
   const staticProxy = getEnv(import.meta.env, Astro, 'STATIC_PROXY') ?? '/static/'
 
-  const search = q ? `?q=${encodeURIComponent(q)}` : ''
+  const search = qDecoded ? `?q=${encodeURIComponent(qDecoded)}` : ''
   const url = id ? `https://${host}/${channel}/${id}?embed=1&mode=tme` : `https://${host}/s/${channel}${search}`
   const headers = Object.fromEntries(Astro.request.headers)
 
