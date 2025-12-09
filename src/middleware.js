@@ -16,7 +16,11 @@ export async function onRequest(context, next) {
       response.headers.set('Speculation-Rules', '"/rules/prefetch.json"')
     }
 
-    if (!response.headers.has('Cache-Control')) {
+    const isSearchPage = context.url.pathname.startsWith('/search')
+    if (isSearchPage) {
+      response.headers.set('Cache-Control', 'no-store')
+    }
+    else if (!response.headers.has('Cache-Control')) {
       response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300')
     }
   }
