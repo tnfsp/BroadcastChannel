@@ -70,7 +70,7 @@ const navs = [
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f4f1ec" />
+    <meta name="theme-color" content="#f8f4ea" />
     <link rel="alternate" type="application/rss+xml" title={`${RSS_PREFIX}${channel?.title}`} href={RSS_URL} />
     <style is:inline>
       @view-transition {
@@ -104,13 +104,7 @@ const navs = [
             ))
           }
         </nav>
-        <button
-          type="button"
-          class="nav-toggle"
-          aria-expanded="false"
-          aria-controls="mobile-nav"
-          data-nav-toggle
-        >
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="mobile-nav" data-nav-toggle>
           Menu
           <span class="nav-toggle-icon" aria-hidden="true">></span>
         </button>
@@ -133,8 +127,7 @@ const navs = [
           <slot />
         </div>
         <div id="aside-container">
-          <slot name="aside">
-          </slot>
+          <slot name="aside" />
         </div>
       </div>
     </div>
